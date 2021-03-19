@@ -1,0 +1,3 @@
+module Simulacrum
+
+end # module
