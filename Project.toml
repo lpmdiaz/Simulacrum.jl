@@ -2,3 +2,7 @@ name = "Simulacrum"
 uuid = "269ce777-b7ba-4d5f-a946-e3476506ba87"
 authors = ["Leo <lpdiaz@student.unimelb.edu.au>"]
 version = "0.1.0"
+
+[deps]
+HyperGraphs = "e54fe45a-379a-431d-91b1-83d23201f60f"
+Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
