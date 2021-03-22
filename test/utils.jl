@@ -1,3 +1,4 @@
+using Simulacrum
 using Symbolics
 
 @variables x
