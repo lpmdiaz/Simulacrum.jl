@@ -1,6 +1,7 @@
 using Test
 
 const tests = [
+    "reactions",
     "utils"
 ]
 
