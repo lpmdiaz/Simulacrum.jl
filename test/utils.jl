@@ -56,3 +56,12 @@ che = convert(ChemicalHyperEdge, r)
 @test eltype(convert(ChemicalHyperEdge{Num}, che)) == Num
 chg = ChemicalHyperGraph(che)
 @test eltype(convert(ChemicalHyperGraph{Num}, chg)) == Num
+
+# converting ordinary edge indices to hyperedge indices for patterns
+n = rand((1:1000))
+idx = indices(AllToAll(n))
+@test length(Simulacrum.edge_idx_to_hyperedge_idx(idx)) == n
+idx = indices(Cycle(n))
+@test length(Simulacrum.edge_idx_to_hyperedge_idx(idx)) == length(idx)
+idx = indices(Path(n))
+@test length(Simulacrum.edge_idx_to_hyperedge_idx(idx)) == length(idx)

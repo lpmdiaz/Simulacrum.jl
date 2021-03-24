@@ -36,3 +36,19 @@ end
 function Base.convert(::Type{ChemicalHyperGraph{Num}}, chg::ChemicalHyperGraph{T}) where {T<:Symbolic}
 	ChemicalHyperGraph{Num}(Num.(vertices(chg)), convert.(ChemicalHyperEdge{Num}, hyperedges(chg)))
 end
+
+# convert directed edge indices to oriented hyperedges (one source, several targets from aggregated edges)
+function edge_idx_to_hyperedge_idx(idx::Vector{Tuple{Int, Int}})
+
+	# group ordinary edge indices according to their source vertex;
+	# edge indices in each group have the same source vertex but different target vertex
+	groups = [filter(v -> first(v) == i, idx) for i in 1:maximum(first.(idx))]
+
+	# make hyperedge indices by concatenating all targets within each group
+	elist = Vector{Tuple{Vector{Int}, Vector{Int}}}(undef, length(groups))
+	@inbounds for (i, group) in enumerate(groups)
+		elist[i] = ([first(group[1])], last.(group))
+	end
+	elist
+
+end
