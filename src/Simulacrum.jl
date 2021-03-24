@@ -9,6 +9,7 @@ const SymTypes = Union{Num, Symbolic}
 export SymTypes
 
 include("bridges/modelingtoolkit.jl")
+include("patterns.jl")
 include("reactions.jl")
 include("utils.jl")
 
@@ -16,6 +17,10 @@ export
 
 # bridges: modelingtoolkit
 mtk_reactions,
+
+# patterns
+AbstractPattern, indices,
+AllToAll, Cycle, Path,
 
 # reactions
 isunimolecular, ismultimolecular
