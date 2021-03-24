@@ -5,6 +5,7 @@ version = "0.1.0"
 
 [deps]
 HyperGraphs = "e54fe45a-379a-431d-91b1-83d23201f60f"
+SymbolicUtils = "d1185830-fcd6-423d-90d6-eec64667417b"
 Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
 
 [extras]
