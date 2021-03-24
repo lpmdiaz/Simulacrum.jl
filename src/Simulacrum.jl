@@ -14,6 +14,9 @@ include("utils.jl")
 
 export
 
+# bridges: modelingtoolkit
+mtk_reactions,
+
 # reactions
 isunimolecular, ismultimolecular
 

@@ -1,10 +1,11 @@
 using Test
 
 const tests = [
+    "bridges/modelingtoolkit",
     "reactions",
     "utils"
 ]
 
 for test in tests
-    @testset "$test" begin include("$test.jl") end
+    @testset "$(replace(test, "/" => ": "))" begin include("$test.jl") end
 end
