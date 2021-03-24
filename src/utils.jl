@@ -27,3 +27,12 @@ function subscript_var(var::Symbolic, sub::Int; iv = Variable(:t))
 end
 subscript_var(v::Num, sub; iv = Variable(:t)) = Num(subscript_var(get_value(v), sub, iv = iv))
 subscript_vars(vars::Vector{T}, sub; iv = Variable(:t)) where {T<:SymTypes} = [subscript_var(var, sub, iv = iv) for var in vars]
+
+# wrap SymbolicUtils variables in chemical hyperedges and hypergraphs into Symbolics.Num
+# useful when converting ModelingToolkit types to chemical hypergraphs and hyperedges and still use the Simulacrum functions that are defined on Num
+function Base.convert(::Type{ChemicalHyperEdge{Num}}, che::ChemicalHyperEdge{T}) where {T<:Symbolic}
+	ChemicalHyperEdge(SpeciesSet(Num.(objects(che.src)), src_stoich(che)), SpeciesSet(Num.(objects(che.tgt)), tgt_stoich(che)), weight(che))
+end
+function Base.convert(::Type{ChemicalHyperGraph{Num}}, chg::ChemicalHyperGraph{T}) where {T<:Symbolic}
+	ChemicalHyperGraph{Num}(Num.(vertices(chg)), convert.(ChemicalHyperEdge{Num}, hyperedges(chg)))
+end

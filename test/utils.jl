@@ -48,3 +48,11 @@ b = Simulacrum.subscript_var(Variable(:x), 1)
 @test typeof(Simulacrum.subscript_var(x, 1)) == typeof(x) == Num
 @test typeof(Simulacrum.get_value(Simulacrum.subscript_var(x, 1))) == typeof(Simulacrum.get_value(x))
 @test typeof(Simulacrum.subscript_var(y, 1)) == typeof(y) == Num
+
+# wrapping Symbolic variables into Num type
+@variables X Y
+r = Reaction(2, [X], [Y])
+che = convert(ChemicalHyperEdge, r)
+@test eltype(convert(ChemicalHyperEdge{Num}, che)) == Num
+chg = ChemicalHyperGraph(che)
+@test eltype(convert(ChemicalHyperGraph{Num}, chg)) == Num
