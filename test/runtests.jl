@@ -6,7 +6,8 @@ const tests = [
     "operations",
     "patterns",
     "reactions",
-    "utils"
+    "utils",
+    "wip"
 ]
 
 for test in tests
