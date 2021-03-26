@@ -1,16 +1,17 @@
 module Simulacrum
 
-using HyperGraphs
-using Symbolics
+using HyperGraphs, Symbolics
 import SymbolicUtils: Term, Sym, Symbolic
+using SimpleTraits
 using ModelingToolkit
 
 const SymTypes = Union{Num, Symbolic}
 export SymTypes
 
-include("bridges/modelingtoolkit.jl")
-include("operations.jl")
 include("patterns.jl")
+include("bridges/modelingtoolkit.jl")
+include("connections.jl")
+include("operations.jl")
 include("reactions.jl")
 include("utils.jl")
 
@@ -18,6 +19,9 @@ export
 
 # bridges: modelingtoolkit
 mtk_reactions,
+
+# connections
+connect, connect!, couple,
 
 # operations
 clone,

@@ -2,6 +2,7 @@ using Test
 
 const tests = [
     "bridges/modelingtoolkit",
+    "connections",
     "operations",
     "patterns",
     "reactions",
