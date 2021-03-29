@@ -10,7 +10,7 @@ n = rand(collect(1:1000))
 n = rand((1:1000))
 @test length(indices(Cycle(n))) == n
 @test_throws ErrorException Cycle(0)
-@test isa(Cycle(4), AbstractPattern)
+@test isa(Cycle(4), Simulacrum.AbstractPattern)
 @test indices(Cycle(1)) == [(1,1)] # a cycle of length 1 is a loop
 
 # path
