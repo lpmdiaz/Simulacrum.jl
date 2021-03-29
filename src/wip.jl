@@ -21,14 +21,14 @@ function build_equations(chg::ChemicalHyperGraph{Num}, f::Function; iv::Symbol =
 end
 
 # overload the ModelingToolkit.ODESystem constructor to work on chemical hypergraphs
-function ODESystem(chg::ChemicalHyperGraph; p = [], iv = Variable(:t))
+function ModelingToolkit.ODESystem(chg::ChemicalHyperGraph, f::Function; p = [], iv = Variable(:t))
 	ODESystem(build_equations(chg, f), iv, vertices(chg), p)
 end
-function ODESystem(chg::ChemicalHyperGraph{Num}; p = [], iv = Variable(:t))
+function ModelingToolkit.ODESystem(chg::ChemicalHyperGraph{Num}, f::Function; p = [], iv = Variable(:t))
 	ODESystem(Simulacrum.get_value(build_equations(chg, f)), iv, vertices(chg), p)
 end
-function ODESystem(chg::ChemicalHyperGraph{T}; p = [], iv = Variable(:t)) where {T<:Term}
-	ODESystem(convert(ChemicalHyperGraph{Num}, chg, p = p, iv = iv))
+function ModelingToolkit.ODESystem(chg::ChemicalHyperGraph{T}, f::Function; p = [], iv = Variable(:t)) where {T<:Term}
+	ODESystem(convert(ChemicalHyperGraph{Num}, chg), f, p = p, iv = iv)
 end
 
 end # module
