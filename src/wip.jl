@@ -5,11 +5,12 @@ using LinearAlgebra: diagm
 import SymbolicUtils: Term, Sym
 
 export mass_action, power_law, combinatoric_power_law, rn_assumptions, make_equations, clone_map,
-AbstractModel, TelegraphModel, hypergraph, make_Langevin_noise
+AbstractModel, AbstractBioModel, TelegraphModel, BirthDeathModel, hypergraph, make_Langevin_noise
 
 # incrementally build common reaction network assumptions on chemical hyperedges
 power_law(che::ChemicalHyperEdge{Num}) = src(che) .^ src_stoich(che)
-combinatoric_power_law(che::ChemicalHyperEdge{Num}) = power_law(che) ./ factorial.(src_stoich(che))
+parse_stoich(s) = s <= 20 ? s : big(s) # factorial for numbers > 20 needs big
+combinatoric_power_law(che::ChemicalHyperEdge{Num}) = power_law(che) ./ factorial.(parse_stoich.(src_stoich(che)))
 mass_action(che::ChemicalHyperEdge{Num}; f::Function = src) = rate(che) * prod(f(che))
 
 # assemble reaction network assumptions on a chemical hyperedge
@@ -85,6 +86,7 @@ const CHE = ChemicalHyperEdge
 const CHG = ChemicalHyperGraph
 abstract type AbstractModel end
 abstract type AbstractBioModel <: AbstractModel end
+abstract type AbstractPhysModel <: AbstractModel end
 hypergraph(m::T) where {T<:AbstractModel} = m.HG
 make_equations(m::T, f::Function) where {T<:AbstractModel} = make_equations(hypergraph(m), f)
 """
@@ -99,13 +101,55 @@ struct TelegraphModel <: AbstractBioModel
     HG::AbstractHyperGraph
     TelegraphModel(; name = :Telegraph) = new(name, make_telegraph_hg())
 end
-function make_telegraph_hg() # add IsOriented, add optional inputs to give type of hypergraph and hyperedges (e.g. :Chemical)
+function make_telegraph_hg()
     @variables t inactive(t) active(t) mRNA(t) λ μ k δ
     hes = [ CHE([inactive], [active], λ),     # promoter: inactive to active
             CHE([active], [inactive], μ),     # promoter: active to inactive
             CHE([active], [mRNA, active], k), # transcription
             CHE([mRNA], Num[], δ)]            # degradation: mRNA to nothing
     CHG(hes)
+end
+"""
+    BirthDeathModel
+
+"""
+struct BirthDeathModel <: AbstractBioModel
+    name::Symbol
+    HG::AbstractHyperGraph
+    function BirthDeathModel(; name = :BirthDeathModel, var::Symbol = :X)
+        @variables t λ μ
+        x = Num(Variable{Symbolics.FnType{Tuple{Any},Real}}(var)(t))
+        hes = [ CHE(Num[], [x], λ),
+                CHE([x], Num[], μ)]
+        new(name, CHG(hes))
+    end
+end
+"""
+    LorenzSystemModel
+
+Model of the Lorenz system, known for its chaotic solutions.
+"""
+struct LorenzSystemModel <: AbstractPhysModel
+    name::Symbol
+    HG::AbstractHyperGraph
+    function LorenzSystemModel(; name = :LorenzSystemModel)
+        @variables t x(t) y(t) z(t) β ρ σ
+        hes = [ # dissipation
+                CHE([x], Num[], σ),
+                CHE([y], Num[], 1),
+                CHE([z], Num[], β),
+
+                # one-way interactions
+                CHE([x], [x, y], ρ),
+                CHE([y], [y, x], σ),
+
+                # two-way interaction
+                CHE([x, y], [x, y, z], 1),
+
+                # three-way interaction
+                CHE([x, y, z], [x, z], 1/y)]
+        new(name, CHG(hes))
+    end
 end
 
 # helper that returns an Expr that can be evaluated to expose variables into the global scope, specifically written for Num types (for now)
@@ -118,12 +162,12 @@ macro expose(arg) # only works for one symbolic variable at a time...
 end
 
 # returns a matrix of Langevin (intrinsic) noise terms
-function make_Langevin_noise(hg::T, propensities_f::Function) where {T<:AbstractHyperGraph}
+function make_Langevin_noise(hg::T, propensities_f::Function; complex = false) where {T<:AbstractHyperGraph}
     !(eltype(hg) <: SymTypes) && error("expected a symbolic hypergraph, got $eltype(hg)")
-    incidence_matrix(hg) * diagm(0 => sqrt.(propensities_f(hg)))
+    incidence_matrix(hg) * diagm(0 => sqrt.((complex ? identity : abs).(propensities_f(hg))))
 end
-function make_Langevin_noise(m::T, propensities_f::Function) where {T<:AbstractModel}
-    make_Langevin_noise(hypergraph(m), propensities_f)
+function make_Langevin_noise(m::T, propensities_f::Function; complex = false) where {T<:AbstractModel}
+    make_Langevin_noise(hypergraph(m), propensities_f, complex = complex)
 end
 
 # more methods for get_value
