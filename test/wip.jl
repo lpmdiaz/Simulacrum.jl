@@ -40,7 +40,7 @@ D = Differential(:t)
 ref_eqs = [	Equation(D(X), - 2*X - 2*X*Y - (X^3)/2),
 			Equation(D(Y), 2*X - 2*X*Y),
 			Equation(D(Z), 2*X*Y)]
-@test isequal(build_equations(chg, ode_rate_law), ref_eqs)
+@test isequal(make_equations(chg, ode_rate_law), ref_eqs)
 
 # zeroth order reactions
 @test isequal(ode_rate_law(ChemicalHyperEdge(Num[], [X], 3)), 3)
@@ -48,7 +48,7 @@ ref_eqs = [	Equation(D(X), - 2*X - 2*X*Y - (X^3)/2),
 
 ## benchmarking against ModelingToolkit to make sure the equations are correct ##
 
-chg_eqs = Simulacrum.get_value(build_equations(chg, ode_rate_law))
+chg_eqs = Simulacrum.get_value(make_equations(chg, ode_rate_law))
 r1 = Reaction(2, [X], [Y])
 r2 = Reaction(2, [X, Y], [Z])
 r3 = Reaction(1, [X], nothing, [3], nothing)
