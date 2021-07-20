@@ -32,6 +32,8 @@ Note that equations passed to an `ODESystem` and other `AbstractSystem` need to 
 
 I am not sure if this is the best approach but it does seem to work for now... It may however change in the future.
 
+__Update__: commit 2d0a248 in Symbolics.jl now makes the rhs and lhs of `Equation`s be of type `Symbolic` and not `Num`; some of the above is thus not needed anymore (but remains in the code in case things do change again).
+
 #### Warning when precompiling
 
 This is caused by doing `Base.:(==)(x::Num, y::Num) = x === y`. Without this however, the following fails:

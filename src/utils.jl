@@ -11,6 +11,10 @@ get_value(n::Num) = Symbolics.value(n)
 get_value(eq::Equation) = Equation(get_value(eq.lhs), get_value(eq.rhs))
 get_value(eqs::Vector{Equation}) = get_value.(eqs)
 
+# temporary addition in order to buffer out changes in Symbolics; allows to fall
+# back on a default case while the code is still being updated
+get_value(x::T) where {T<:Symbolic} = x
+
 # helper that returns the name of a symbolic variable, for a few different types
 get_sym_name(s::Term) = s.f.name
 get_sym_name(s::Sym) = s.name

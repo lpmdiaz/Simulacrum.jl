@@ -13,7 +13,9 @@ diff = D(z)
 eq = Equation(diff, x)
 
 # code below is only useful if this is true
-@test typeof(x) == typeof(diff) == typeof(eq.lhs) == typeof(eq.rhs) == Num
+# @test typeof(x) == typeof(diff) == typeof(eq.lhs) == typeof(eq.rhs) == Num
+# update: Equation types now come unwrapped out of the box; still keeping these
+# in case that changes again in the future
 
 # testing unwrapping of Num via get_value
 conv_eq = Simulacrum.get_value(eq)
