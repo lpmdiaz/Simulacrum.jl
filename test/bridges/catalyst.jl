@@ -1,14 +1,14 @@
 using Simulacrum
-using HyperGraphs, Symbolics, ModelingToolkit
+using HyperGraphs, Catalyst
 
-# setting up some ModelingToolkit Reaction and ChemicalHyperEdge variables
+# setting up some Catalyst Reaction and ChemicalHyperEdge variables
 # r1 and r2 are equivalent to che1 and che2, respectively
 @variables t X(t) Y(t) Z(t)
-r1 = Reaction(2, [X], [Y])					# mtk unimolecular
-r2 = Reaction(2, [X, Y], [Z])				# mtk multimolecular
+r1 = Reaction(2, [X], [Y])					# Catalyst reaction unimolecular
+r2 = Reaction(2, [X, Y], [Z])				# Catalyst reaction multimolecular
 che1 = ChemicalHyperEdge([X], [Y], 2)		# chemical hyperedge unimolecular
 che2 = ChemicalHyperEdge([X, Y], [Z], 2)	# chemical hyperedge multimolecular
-rsys = ReactionSystem([r1, r2], t, [X, Y, Z], [])
+@named rsys = ReactionSystem([r1, r2], t, [X, Y, Z], [])
 chg = ChemicalHyperGraph([che1, che2])
 
 # testing equivalence
@@ -21,7 +21,7 @@ rx = [Reaction(1, nothing, [X]), Reaction(1, [Y], nothing)]
 @test typeof(convert(ChemicalHyperEdge, rx)) == Vector{ChemicalHyperEdge{eltype(rx[1].products)}}
 @test typeof(convert(Reaction, che1).substrates) == Vector{eltype(r1.substrates)}
 @test eltype(convert(ChemicalHyperGraph, rsys)) == eltype(equations(rsys)[1].substrates)
-mtk_reactions(chg)
+catalyst_reactions(chg)
 convert(ReactionSystem, chg)
 ChemicalHyperGraph(r1)
 ChemicalHyperGraph([r1, r2])

@@ -4,12 +4,13 @@ using HyperGraphs, Symbolics
 import SymbolicUtils: Term, Sym, Symbolic
 using SimpleTraits
 using ModelingToolkit
+using Catalyst
 
 const SymTypes = Union{Num, Symbolic}
 export SymTypes
 
 include("patterns.jl")
-include("bridges/modelingtoolkit.jl")
+include("bridges/catalyst.jl")
 include("connections.jl")
 include("operations.jl")
 include("reactions.jl")
@@ -18,8 +19,8 @@ include("wip.jl")
 
 export
 
-# bridges: modelingtoolkit
-mtk_reactions,
+# bridges: catalyst
+catalyst_reactions,
 
 # connections
 connect, connect!, couple,

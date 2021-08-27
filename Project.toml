@@ -4,6 +4,7 @@ authors = ["Leo <lpdiaz@student.unimelb.edu.au>"]
 version = "0.1.0"
 
 [deps]
+Catalyst = "479239e8-5488-4da2-87a7-35f2df7eef83"
 HyperGraphs = "e54fe45a-379a-431d-91b1-83d23201f60f"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 ModelingToolkit = "961ee093-0014-501f-94e3-6117800e7a78"

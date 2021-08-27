@@ -1,7 +1,7 @@
 using Test
 
 const tests = [
-    "bridges/modelingtoolkit",
+    "bridges/catalyst",
     "connections",
     "operations",
     "patterns",
