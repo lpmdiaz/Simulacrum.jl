@@ -31,7 +31,7 @@ end
 catalyst_reactions(chg::ChemicalHyperGraph) = convert(Catalyst.Reaction, hyperedges(chg))
 
 # convert a ChemicalHyperGraph to a ReactionSystem
-function Base.convert(::Type{Catalyst.ReactionSystem}, chg::ChemicalHyperGraph; p = [], iv = Variable(:t))
+function Base.convert(::Type{Catalyst.ReactionSystem}, chg::ChemicalHyperGraph; p = [], iv = Symbolics.variable(:t))
     Catalyst.ReactionSystem(catalyst_reactions(chg), iv, vertices(chg), p, name = :rsys)
 end
 

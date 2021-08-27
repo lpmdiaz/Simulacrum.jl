@@ -21,16 +21,16 @@ get_sym_name(s::Sym) = s.name
 get_sym_name(s::Num) = get_sym_name(get_value(s))
 
 # helper function that returns the symbolic variable given as input with the given subscript
-function subscript_var(var::Symbolic, sub::Int; iv = Variable(:t))
+function subscript_var(var::Symbolic, sub::Int; iv = Symbolics.variable(:t))
     symname = get_sym_name(var)
     if var isa Term
-        Variable{Symbolics.FnType{Tuple{Any},Real}}(symname, sub)(iv)
+        Symbolics.variable(symname, sub, T = Symbolics.FnType)(iv)
     elseif var isa Sym
-        Variable(symname, sub)
+        Symbolics.variable(symname, sub)
     end
 end
-subscript_var(v::Num, sub; iv = Variable(:t)) = Num(subscript_var(get_value(v), sub, iv = iv))
-subscript_vars(vars::Vector{T}, sub; iv = Variable(:t)) where {T<:SymTypes} = [subscript_var(var, sub, iv = iv) for var in vars]
+subscript_var(v::Num, sub; iv = Symbolics.variable(:t)) = Num(subscript_var(get_value(v), sub, iv = iv))
+subscript_vars(vars::Vector{T}, sub; iv = Symbolics.variable(:t)) where {T<:SymTypes} = [subscript_var(var, sub, iv = iv) for var in vars]
 
 # wrap SymbolicUtils variables in chemical hyperedges and hypergraphs into Symbolics.Num
 # useful when converting ModelingToolkit types to chemical hypergraphs and hyperedges and still use the Simulacrum functions that are defined on Num

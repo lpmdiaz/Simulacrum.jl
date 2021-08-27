@@ -26,18 +26,18 @@ function make_equations(chg::ChemicalHyperGraph{Num}, f::Function; iv::Symbol = 
 end
 
 # overload the ModelingToolkit.ODESystem constructor to work on chemical hypergraphs
-function ModelingToolkit.ODESystem(chg::ChemicalHyperGraph, f::Function; iv = Variable(:t), states = vertices(chg), ps = [])
+function ModelingToolkit.ODESystem(chg::ChemicalHyperGraph, f::Function; iv = Symbolics.variable(:t), states = vertices(chg), ps = [])
     ODESystem(make_equations(chg, f), iv, states, ps)
 end
-function ModelingToolkit.ODESystem(chg::ChemicalHyperGraph{Num}, f::Function; iv = Variable(:t), states = vertices(chg), ps = [])
+function ModelingToolkit.ODESystem(chg::ChemicalHyperGraph{Num}, f::Function; iv = Symbolics.variable(:t), states = vertices(chg), ps = [])
     ODESystem(Simulacrum.get_value(make_equations(chg, f)), iv, states, ps)
 end
-function ModelingToolkit.ODESystem(chg::ChemicalHyperGraph{T}, f::Function; iv = Variable(:t), ps = []) where {T<:Term}
+function ModelingToolkit.ODESystem(chg::ChemicalHyperGraph{T}, f::Function; iv = Symbolics.variable(:t), ps = []) where {T<:Term}
     ODESystem(convert(ChemicalHyperGraph{Num}, chg), f, iv = iv, ps = ps)
 end
 
 # automatically convert equations in matrix form to vector (convenience)
-ModelingToolkit.ODESystem(eqs::Matrix{Equation}; iv = Variable(:t), states = get_state_variables(vec(eqs)), ps = get_parameters(vec(eqs))) = ODESystem(vec(eqs), iv, states, ps)
+ModelingToolkit.ODESystem(eqs::Matrix{Equation}; iv = Symbolics.variable(:t), states = get_state_variables(vec(eqs)), ps = get_parameters(vec(eqs))) = ODESystem(vec(eqs), iv, states, ps)
 
 # helper function that takes a hypergraph that has been made by cloning a base model n times and returns a map to be used with ModelingToolkit
 function clone_map(in_map::Vector{Pair{T, U}}, clones::Vector) where {T, U}
@@ -118,7 +118,7 @@ struct BirthDeathModel <: AbstractBioModel
     HG::AbstractHyperGraph
     function BirthDeathModel(; name = :BirthDeathModel, var::Symbol = :X)
         @variables t λ μ
-        x = Num(Variable{Symbolics.FnType{Tuple{Any},Real}}(var)(t))
+        x = Num(Symbolics.variable(var, T = Symbolics.FnType)(t))
         hes = [ CHE(Num[], [x], λ),
                 CHE([x], Num[], μ)]
         new(name, CHG(hes))

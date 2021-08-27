@@ -25,13 +25,13 @@ eq = Equation(diff, y)
 conv_eq = Simulacrum.get_value(eq)
 @test typeof(conv_eq.rhs) <: Sym{Real}
 
-@test Simulacrum.get_sym_name(Variable{Symbolics.FnType}(:x)(t)) == :x # Term
-@test Simulacrum.get_sym_name(Variable(:x)) == :x # Sym
-@test Simulacrum.get_sym_name(Num(Variable(:x))) == :x # Num
+@test Simulacrum.get_sym_name(Symbolics.variable(:x, T = Symbolics.FnType)(t)) == :x # Term
+@test Simulacrum.get_sym_name(Symbolics.variable(:x)) == :x # Sym
+@test Simulacrum.get_sym_name(Num(Symbolics.variable(:x))) == :x # Num
 
 # subscript_var: Term, Sym, and Num types
-a = Variable{Symbolics.FnType{Tuple{Any},Real}}(:x)(t)
-b = Variable(:x)
+a = Symbolics.variable(:x, T = Symbolics.FnType)(t)
+b = Symbolics.variable(:t)
 c = (@variables x(t))[1]
 typeof(a) == Term{Real, Nothing}
 typeof(b) == Sym{Real, Nothing}
@@ -41,8 +41,8 @@ typeof(c) == Num
 @test typeof(Simulacrum.subscript_var(c, 1)) == typeof(c)
 
 # subscript_var and subscript_vars
-a = Simulacrum.subscript_vars([Variable(:x)], 1)[1]
-b = Simulacrum.subscript_var(Variable(:x), 1)
+a = Simulacrum.subscript_vars([Symbolics.variable(:x)], 1)[1]
+b = Simulacrum.subscript_var(Symbolics.variable(:x), 1)
 @test isequal(a, b)
 
 # subscript_var: Num type
