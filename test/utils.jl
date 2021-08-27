@@ -20,10 +20,10 @@ eq = Equation(diff, x)
 # testing unwrapping of Num via get_value
 conv_eq = Simulacrum.get_value(eq)
 @test eq == conv_eq
-@test typeof(conv_eq.lhs) == typeof(conv_eq.rhs) == Term{Real, Nothing}
+@test typeof(conv_eq.lhs) <: Term{Real} && typeof(conv_eq.rhs) <: Term{Real}
 eq = Equation(diff, y)
 conv_eq = Simulacrum.get_value(eq)
-@test typeof(conv_eq.rhs) == Sym{Real, Nothing}
+@test typeof(conv_eq.rhs) <: Sym{Real}
 
 @test Simulacrum.get_sym_name(Variable{Symbolics.FnType}(:x)(t)) == :x # Term
 @test Simulacrum.get_sym_name(Variable(:x)) == :x # Sym
@@ -52,7 +52,7 @@ b = Simulacrum.subscript_var(Variable(:x), 1)
 @test typeof(Simulacrum.subscript_var(y, 1)) == typeof(y) == Num
 
 # wrapping Symbolic variables into Num type
-@variables X Y
+@variables t X(t) Y(t)
 r = Reaction(2, [X], [Y])
 che = convert(ChemicalHyperEdge, r)
 @test eltype(convert(ChemicalHyperEdge{Num}, che)) == Num
