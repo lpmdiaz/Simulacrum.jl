@@ -1,5 +1,6 @@
 using Simulacrum, Simulacrum.Wip
 using HyperGraphs, Symbolics
+using Catalyst
 
 @variables t X(t) Y(t) Z(t)
 che1 = ChemicalHyperEdge([X], [Y], 2)
@@ -52,7 +53,7 @@ chg_eqs = Simulacrum.get_value(make_equations(chg, ode_rate_law))
 r1 = Reaction(2, [X], [Y])
 r2 = Reaction(2, [X, Y], [Z])
 r3 = Reaction(1, [X], nothing, [3], nothing)
-rsys = ReactionSystem([r1, r2, r3], t, [X, Y, Z], [])
+@named rsys = ReactionSystem([r1, r2, r3], t, [X, Y, Z], [])
 sys = convert(ODESystem, rsys)
 mtk_eqs = equations(sys)
 chg_eqs_rhss = [eq.rhs for eq in chg_eqs]
