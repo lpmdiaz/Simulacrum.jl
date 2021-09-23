@@ -34,17 +34,6 @@ I am not sure if this is the best approach but it does seem to work for now... I
 
 __Update__: commit 2d0a248 in Symbolics.jl now makes the rhs and lhs of `Equation`s be of type `Symbolic` and not `Num`; some of the above is thus not needed anymore (but remains in the code in case things do change again).
 
-#### Warning when precompiling
-
-This is caused by doing `Base.:(==)(x::Num, y::Num) = x === y`. Without this however, the following fails:
-```julia
-using Symbolics
-@variables x
-x == x # returns "x == x"
-x in [x] # errors
-```
-And this needs to work in order to properly use functions from HyperGraphs.jl... This is probably a poor solution though.
-
 ### Exported functions
 
 Functions should be used with caution (especially those defined in `connections.jl`) as this is very much a work in progress and there may be undesirable behaviours. For instance, when using a hyperedge as a template when connecting vertices, the length of all fields in the template hyperedge must match that of all fields in the to-be-created hyperedges, otherwise some fields will have incorrect lengths...

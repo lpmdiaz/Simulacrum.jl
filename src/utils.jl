@@ -1,6 +1,5 @@
-# extending Base.:(==) to allow equality check on symbolic variables (here dispatched on Symbolics Num type)
-# Symbolics does extend Base.:(==) but calling `x in [x]` and `x == x` where x is of type Num fails
-Base.:(==)(x::Num, y::Num) = x === y
+# extending Base.in to Symbolics.Num types (useful for HyperGraphs of Num type)
+Base.in(x::Num, collection::AbstractVector) = any(isequal(x, y) for y in collection)
 
 # returns the most specialised type
 get_lowest_subtype(t1::Type, t2::Type) = t1 <: t2 ? t1 : t2
