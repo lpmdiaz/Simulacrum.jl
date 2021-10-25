@@ -33,6 +33,7 @@ AbstractPattern, indices,
 AllToAll, Cycle, Path,
 
 # reactions
-isunimolecular, ismultimolecular
+isunimolecular, ismultimolecular,
+reversible_reaction, @reversible
 
 end # module
