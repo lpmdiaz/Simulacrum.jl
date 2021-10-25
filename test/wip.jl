@@ -38,9 +38,9 @@ ode_rate_law(chg::ChemicalHyperGraph{Num}) = ode_rate_law.(hyperedges(chg))
 
 # full equations
 D = Differential(:t)
-ref_eqs = [	Equation(D(X), - 2*X - 2*X*Y - (X^3)/2),
-			Equation(D(Y), 2*X - 2*X*Y),
-			Equation(D(Z), 2*X*Y)]
+ref_eqs = [ Equation(D(X), - 2*X - 2*X*Y - (X^3)/2),
+            Equation(D(Y), 2*X - 2*X*Y),
+            Equation(D(Z), 2*X*Y)]
 @test isequal(make_equations(chg, ode_rate_law), ref_eqs)
 
 # zeroth order reactions

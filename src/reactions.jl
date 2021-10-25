@@ -13,5 +13,5 @@ reversible_reaction(e::ChemicalHyperEdge, rates::AbstractVector) = reversible_re
 
 # macro to easily use the above
 macro reversible(e, rates)
-	return esc(:(reversible_reaction($e, $rates)))
+    return esc(:(reversible_reaction($e, $rates)))
 end
