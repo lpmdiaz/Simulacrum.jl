@@ -69,8 +69,8 @@ b = Simulacrum.subscript_var(Symbolics.variable(:x), 1)
 r = Reaction(2, [X], [Y])
 che = convert(ChemicalHyperEdge, r)
 @test eltype(convert(ChemicalHyperEdge{Num}, che)) == Num
-chg = ChemicalHyperGraph(che)
-@test eltype(convert(ChemicalHyperGraph{Num}, chg)) == Num
+chx = ChemicalHyperGraph(che)
+@test eltype(convert(ChemicalHyperGraph{Num}, chx)) == Num
 
 # converting ordinary edge indices to hyperedge indices for patterns
 n = rand((1:1000))

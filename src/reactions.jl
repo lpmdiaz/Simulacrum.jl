@@ -9,9 +9,9 @@ function reversible_reaction(s1, s2, rates::AbstractVector)
     bwd = switch(fwd); update_weight!(bwd, rates[2])
     return [fwd, bwd]
 end
-reversible_reaction(e::ChemicalHyperEdge, rates::AbstractVector) = reversible_reaction(src(e), tgt(e), rates)
+reversible_reaction(che::ChemicalHyperEdge, rates::AbstractVector) = reversible_reaction(src(che), tgt(che), rates)
 
 # macro to easily use the above
-macro reversible(e, rates)
-    return esc(:(reversible_reaction($e, $rates)))
+macro reversible(che, rates)
+    return esc(:(reversible_reaction($che, $rates)))
 end

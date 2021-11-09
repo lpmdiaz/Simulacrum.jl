@@ -60,8 +60,8 @@ subscript_vars(vars::Vector{T}, sub; iv = Symbolics.variable(:t)) where {T<:SymT
 function Base.convert(::Type{ChemicalHyperEdge{Num}}, che::ChemicalHyperEdge{T}) where {T<:Symbolic}
     ChemicalHyperEdge(SpeciesSet(Num.(objects(che.src)), src_stoich(che)), SpeciesSet(Num.(objects(che.tgt)), tgt_stoich(che)), weight(che))
 end
-function Base.convert(::Type{ChemicalHyperGraph{Num}}, chg::ChemicalHyperGraph{T}) where {T<:Symbolic}
-    ChemicalHyperGraph{Num}(Num.(vertices(chg)), convert.(ChemicalHyperEdge{Num}, hyperedges(chg)))
+function Base.convert(::Type{ChemicalHyperGraph{Num}}, chx::ChemicalHyperGraph{T}) where {T<:Symbolic}
+    ChemicalHyperGraph{Num}(Num.(vertices(chx)), convert.(ChemicalHyperEdge{Num}, hyperedges(chx)))
 end
 
 # convert directed edge indices to oriented hyperedges (one source, several targets from aggregated edges)

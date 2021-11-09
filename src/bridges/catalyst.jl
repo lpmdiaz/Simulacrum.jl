@@ -28,11 +28,11 @@ function Base.convert(::Type{ChemicalHyperGraph}, rsys::Catalyst.ReactionSystem)
 end
 
 # return reactions from a chemical hypergraph
-catalyst_reactions(chg::ChemicalHyperGraph) = convert(Catalyst.Reaction, hyperedges(chg))
+catalyst_reactions(chx::ChemicalHyperGraph) = convert(Catalyst.Reaction, hyperedges(chx))
 
 # convert a ChemicalHyperGraph to a ReactionSystem
-function Base.convert(::Type{Catalyst.ReactionSystem}, chg::ChemicalHyperGraph; p = [], iv = Symbolics.variable(:t))
-    Catalyst.ReactionSystem(catalyst_reactions(chg), iv, vertices(chg), p, name = :rsys)
+function Base.convert(::Type{Catalyst.ReactionSystem}, chx::ChemicalHyperGraph; p = [], iv = Symbolics.variable(:t))
+    Catalyst.ReactionSystem(catalyst_reactions(chx), iv, vertices(chx), p, name = :rsys)
 end
 
 # overload the ChemicalHyperGraph constructor to Reaction and ReactionSystem types

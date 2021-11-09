@@ -15,25 +15,25 @@ mass_action(che::ChemicalHyperEdge{Num}; f::Function = src) = rate(che) * prod(f
 
 # assemble reaction network assumptions on a chemical hyperedge
 rn_assumptions(che::ChemicalHyperEdge{Num}) = mass_action(che, f = combinatoric_power_law)
-rn_assumptions(chg::ChemicalHyperGraph{Num}) = rn_assumptions.(hyperedges(chg))
+rn_assumptions(chx::ChemicalHyperGraph{Num}) = rn_assumptions.(hyperedges(chx))
 
 # helper function that returns equations describing how the system evolves over time for the given chemical hypergraph
-function make_equations(chg::ChemicalHyperGraph{Num}, f::Function; iv::Symbol = :t)
+function make_equations(chx::ChemicalHyperGraph{Num}, f::Function; iv::Symbol = :t)
     D    = Differential(iv)
-    lhss = [D(x) for x in vertices(chg)]
-    rhss = incidence_matrix(chg) * f(chg)
+    lhss = [D(x) for x in vertices(chx)]
+    rhss = incidence_matrix(chx) * f(chx)
     eqs  = Equation.(lhss, rhss)
 end
 
 # overload the ModelingToolkit.ODESystem constructor to work on chemical hypergraphs
-function ModelingToolkit.ODESystem(chg::ChemicalHyperGraph, f::Function; iv = Symbolics.variable(:t), states = vertices(chg), ps = [])
-    ODESystem(make_equations(chg, f), iv, states, ps)
+function ModelingToolkit.ODESystem(chx::ChemicalHyperGraph, f::Function; iv = Symbolics.variable(:t), states = vertices(chx), ps = [])
+    ODESystem(make_equations(chx, f), iv, states, ps)
 end
-function ModelingToolkit.ODESystem(chg::ChemicalHyperGraph{Num}, f::Function; iv = Symbolics.variable(:t), states = vertices(chg), ps = [])
-    ODESystem(Simulacrum.get_value(make_equations(chg, f)), iv, states, ps)
+function ModelingToolkit.ODESystem(chx::ChemicalHyperGraph{Num}, f::Function; iv = Symbolics.variable(:t), states = vertices(chx), ps = [])
+    ODESystem(Simulacrum.get_value(make_equations(chx, f)), iv, states, ps)
 end
-function ModelingToolkit.ODESystem(chg::ChemicalHyperGraph{T}, f::Function; iv = Symbolics.variable(:t), ps = []) where {T<:Term}
-    ODESystem(convert(ChemicalHyperGraph{Num}, chg), f, iv = iv, ps = ps)
+function ModelingToolkit.ODESystem(chx::ChemicalHyperGraph{T}, f::Function; iv = Symbolics.variable(:t), ps = []) where {T<:Term}
+    ODESystem(convert(ChemicalHyperGraph{Num}, chx), f, iv = iv, ps = ps)
 end
 
 # automatically convert equations in matrix form to vector (convenience)
@@ -49,8 +49,8 @@ function clone_map(in_map::Vector{Pair{T, U}}, clones::Vector) where {T, U}
     end
     out_map
 end
-function clone_map(in_map::Vector{Pair{T, U}}, hg::V) where {T, U, V<:AbstractHyperGraph}
-    clone_map(in_map, vertices(hg))
+function clone_map(in_map::Vector{Pair{T, U}}, x::V) where {T, U, V<:AbstractHyperGraph}
+    clone_map(in_map, vertices(x))
 end
 
 # helper function that makes maps to be used with e.g. ModelingToolkit
@@ -82,12 +82,12 @@ end
 get_parameters(eqs::Vector{Equation}) = union(vcat(get_parameters.(eqs)...))
 
 # prototype of models.jl
-const CHE = ChemicalHyperEdge
-const CHG = ChemicalHyperGraph
+const ChE = ChemicalHyperEdge
+const ChX = ChemicalHyperGraph
 abstract type AbstractModel end
 abstract type AbstractBioModel <: AbstractModel end
 abstract type AbstractPhysModel <: AbstractModel end
-hypergraph(m::T) where {T<:AbstractModel} = m.HG
+hypergraph(m::T) where {T<:AbstractModel} = m.X
 make_equations(m::T, f::Function) where {T<:AbstractModel} = make_equations(hypergraph(m), f)
 """
     TelegraphModel
@@ -98,16 +98,16 @@ active and inactive variables represent time spent in either state; this means t
 """
 struct TelegraphModel <: AbstractBioModel
     name::Symbol
-    HG::AbstractHyperGraph
-    TelegraphModel(; name = :Telegraph) = new(name, make_telegraph_hg())
+    X::AbstractHyperGraph
+    TelegraphModel(; name = :Telegraph) = new(name, make_telegraph_x())
 end
-function make_telegraph_hg()
+function make_telegraph_x()
     @variables t inactive(t) active(t) mRNA(t) λ μ k δ
-    hes = [ CHE([inactive], [active], λ),     # promoter: inactive to active
-            CHE([active], [inactive], μ),     # promoter: active to inactive
-            CHE([active], [mRNA, active], k), # transcription
-            CHE([mRNA], Num[], δ)]            # degradation: mRNA to nothing
-    CHG(hes)
+    es = [  ChE([inactive], [active], λ),     # promoter: inactive to active
+            ChE([active], [inactive], μ),     # promoter: active to inactive
+            ChE([active], [mRNA, active], k), # transcription
+            ChE([mRNA], Num[], δ)]            # degradation: mRNA to nothing
+    ChX(es)
 end
 """
     BirthDeathModel
@@ -115,13 +115,13 @@ end
 """
 struct BirthDeathModel <: AbstractBioModel
     name::Symbol
-    HG::AbstractHyperGraph
+    X::AbstractHyperGraph
     function BirthDeathModel(; name = :BirthDeathModel, var::Symbol = :X)
         @variables t λ μ
         x = Num(Symbolics.variable(var, T = Symbolics.FnType)(t))
-        hes = [ CHE(Num[], [x], λ),
-                CHE([x], Num[], μ)]
-        new(name, CHG(hes))
+        es = [  ChE(Num[], [x], λ),
+                ChE([x], Num[], μ)]
+        new(name, ChX(es))
     end
 end
 """
@@ -131,24 +131,24 @@ Model of the Lorenz system, known for its chaotic solutions.
 """
 struct LorenzSystemModel <: AbstractPhysModel
     name::Symbol
-    HG::AbstractHyperGraph
+    X::AbstractHyperGraph
     function LorenzSystemModel(; name = :LorenzSystemModel)
         @variables t x(t) y(t) z(t) β ρ σ
-        hes = [ # dissipation
-                CHE([x], Num[], σ),
-                CHE([y], Num[], 1),
-                CHE([z], Num[], β),
+        es = [  # dissipation
+                ChE([x], Num[], σ),
+                ChE([y], Num[], 1),
+                ChE([z], Num[], β),
 
                 # one-way interactions
-                CHE([x], [x, y], ρ),
-                CHE([y], [y, x], σ),
+                ChE([x], [x, y], ρ),
+                ChE([y], [y, x], σ),
 
                 # two-way interaction
-                CHE([x, y], [x, y, z], 1),
+                ChE([x, y], [x, y, z], 1),
 
                 # three-way interaction
-                CHE([x, y, z], [x, z], 1/y)]
-        new(name, CHG(hes))
+                ChE([x, y, z], [x, z], 1/y)]
+        new(name, ChX(es))
     end
 end
 
@@ -162,9 +162,9 @@ macro expose(arg) # only works for one symbolic variable at a time...
 end
 
 # returns a matrix of Langevin (intrinsic) noise terms
-function make_Langevin_noise(hg::T, propensities_f::Function; complex = false) where {T<:AbstractHyperGraph}
-    !(eltype(hg) <: SymTypes) && error("expected a symbolic hypergraph, got $eltype(hg)")
-    incidence_matrix(hg) * diagm(0 => sqrt.((complex ? identity : abs).(propensities_f(hg))))
+function make_Langevin_noise(x::T, propensities_f::Function; complex = false) where {T<:AbstractHyperGraph}
+    !(eltype(x) <: SymTypes) && error("expected a symbolic hypergraph, got $eltype(x)")
+    incidence_matrix(x) * diagm(0 => sqrt.((complex ? identity : abs).(propensities_f(x))))
 end
 function make_Langevin_noise(m::T, propensities_f::Function; complex = false) where {T<:AbstractModel}
     make_Langevin_noise(hypergraph(m), propensities_f, complex = complex)
