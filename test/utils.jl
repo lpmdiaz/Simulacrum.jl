@@ -29,6 +29,19 @@ conv_eq = Simulacrum.get_value(eq)
 @test Simulacrum.get_sym_name(Symbolics.variable(:x)) == :x # Sym
 @test Simulacrum.get_sym_name(Num(Symbolics.variable(:x))) == :x # Num
 
+# make_var (& gen_var)
+@variables t
+make_var(:test1)
+make_var(:test2, 1)
+make_var(:test3, t)
+make_var(:test4, 1, t)
+@test_throws ErrorException make_var(:test5, make_var(:somevar, t))
+@test_throws MethodError make_var(:test6, t, t)
+x = make_var(:x)
+@test x === make_var(:x)
+y = make_var(:y, t)
+@test isequal(y, make_var(:y, t))
+
 # subscript_var: Term, Sym, and Num types
 a = Symbolics.variable(:x, T = Symbolics.FnType)(t)
 b = Symbolics.variable(:t)

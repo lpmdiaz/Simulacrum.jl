@@ -34,6 +34,9 @@ AllToAll, Cycle, Path,
 
 # reactions
 isunimolecular, ismultimolecular,
-reversible_reaction, @reversible
+reversible_reaction, @reversible,
+
+# utils
+make_var
 
 end # module

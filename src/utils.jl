@@ -19,6 +19,30 @@ get_sym_name(s::Term) = s.f.name
 get_sym_name(s::Sym) = s.name
 get_sym_name(s::Num) = get_sym_name(get_value(s))
 
+# helpers that abstract away the Symbolics syntax
+function _check_symvar(var::Num)
+    if isa(get_value(var), Sym)
+        true
+    else
+        vartype = typeof(get_value(var)).name.wrapper
+        error("$var of type $vartype; expected SymbolicUtils.Sym")
+    end
+end
+_make_subname(symname::Symbol, idx::Int) = Symbol(symname, join(Symbolics.map_subscripts.(idx), "ˏ"))
+genvar(symname::Symbol) = first(@variables $symname)
+function genvar(symname::Symbol, idx::Int)
+    (name = _make_subname(symname, idx); first(@variables $name))
+end
+function genvar(symname::Symbol, var::Num)
+    _check_symvar(var) && first(@variables $symname($var))
+end
+function genvar(symname::Symbol, idx::Int, var::Num)
+    _check_symvar(var) && (name = _make_subname(symname, idx); first(@variables $name($var)))
+end
+
+# helper acting as a gateway to genvar. this might later check whether the variable already exists or not; if it does, it would then just evaluate it and not generate it again. may be renamed to use_var when that behaviour is implemented
+make_var(symname::Symbol, args...) = genvar(symname, args...)
+
 # helper function that returns the symbolic variable given as input with the given subscript
 function subscript_var(var::Symbolic, sub::Int; iv = Symbolics.variable(:t))
     symname = get_sym_name(var)
