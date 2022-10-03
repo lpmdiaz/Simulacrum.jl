@@ -42,6 +42,13 @@ x = make_var(:x)
 y = make_var(:y, t)
 @test isequal(y, make_var(:y, t))
 
+# make_vars
+make_vars([:test7_1, :test7_2], 1)
+make_vars([:test8_1, :test8_2], t)
+make_vars([:test9_1, :test9_2], 1, t)
+z = make_var(:z, t)
+@test isequal(z, make_vars([:z], t)[1])
+
 # subscript_var: Term, Sym, and Num types
 a = Symbolics.variable(:x, T = Symbolics.FnType)(t)
 b = Symbolics.variable(:t)

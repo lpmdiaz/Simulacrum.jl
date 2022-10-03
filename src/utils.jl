@@ -40,8 +40,9 @@ function genvar(symname::Symbol, idx::Int, var::Num)
     _check_symvar(var) && (name = _make_subname(symname, idx); first(@variables $name($var)))
 end
 
-# helper acting as a gateway to genvar. this might later check whether the variable already exists or not; if it does, it would then just evaluate it and not generate it again. may be renamed to use_var when that behaviour is implemented
+# helpers acting as a gateway to genvar. this might later check whether the variable already exists or not; if it does, it would then just evaluate it and not generate it again. may be renamed to use_var when that behaviour is implemented
 make_var(symname::Symbol, args...) = genvar(symname, args...)
+make_vars(symnames::Vector{Symbol}, args...) = [genvar(symname, args...) for symname in symnames]
 
 # helper function that returns the symbolic variable given as input with the given subscript
 function subscript_var(var::Symbolic, sub::Int; iv = Symbolics.variable(:t))

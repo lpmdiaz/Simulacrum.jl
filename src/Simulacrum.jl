@@ -37,6 +37,6 @@ isunimolecular, ismultimolecular,
 reversible_reaction, @reversible,
 
 # utils
-make_var
+make_var, make_vars
 
 end # module
