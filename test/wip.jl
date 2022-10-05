@@ -37,7 +37,7 @@ ode_rate_law(chx::ChemicalHyperGraph{Num}) = ode_rate_law.(hyperedges(chx))
 @test isequal(ode_rate_law(che3), (X^3)/6)
 
 # full equations
-D = Differential(:t)
+D = Differential(t)
 ref_eqs = [ Equation(D(X), - 2*X - 2*X*Y - (X^3)/2),
             Equation(D(Y), 2*X - 2*X*Y),
             Equation(D(Z), 2*X*Y)]
@@ -56,6 +56,4 @@ r3 = Reaction(1, [X], nothing, [3], nothing)
 @named rsys = ReactionSystem([r1, r2, r3], t, [X, Y, Z], [])
 sys = convert(ODESystem, rsys)
 mtk_eqs = equations(sys)
-chx_eqs_rhss = [eq.rhs for eq in chx_eqs]
-mtk_eqs_rhss = [eq.rhs for eq in mtk_eqs]
-@test isequal(chx_eqs_rhss, mtk_eqs_rhss) # for some reason the left hand sides aren't equal
+@test isequal(chx_eqs, mtk_eqs)

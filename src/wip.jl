@@ -18,26 +18,26 @@ rn_assumptions(che::ChemicalHyperEdge{Num}) = mass_action(che, f = combinatoric_
 rn_assumptions(chx::ChemicalHyperGraph{Num}) = rn_assumptions.(hyperedges(chx))
 
 # helper function that returns equations describing how the system evolves over time for the given chemical hypergraph
-function make_equations(chx::ChemicalHyperGraph{Num}, f::Function; iv::Symbol = :t)
+function make_equations(x::ChemicalHyperGraph{Num}, f::Function; iv = make_var(:t))
     D    = Differential(iv)
-    lhss = [D(x) for x in vertices(chx)]
-    rhss = incidence_matrix(chx) * f(chx)
+    lhss = [D(v) for v in vertices(x)]
+    rhss = incidence_matrix(x) * f(x)
     eqs  = Equation.(lhss, rhss)
 end
 
 # overload the ModelingToolkit.ODESystem constructor to work on chemical hypergraphs
-function ModelingToolkit.ODESystem(chx::ChemicalHyperGraph, f::Function; iv = Symbolics.variable(:t), states = vertices(chx), ps = [])
+function ModelingToolkit.ODESystem(chx::ChemicalHyperGraph, f::Function; iv = make_var(:t), states = vertices(chx), ps = [])
     ODESystem(make_equations(chx, f), iv, states, ps)
 end
-function ModelingToolkit.ODESystem(chx::ChemicalHyperGraph{Num}, f::Function; iv = Symbolics.variable(:t), states = vertices(chx), ps = [])
+function ModelingToolkit.ODESystem(chx::ChemicalHyperGraph{Num}, f::Function; iv = make_var(:t), states = vertices(chx), ps = [])
     ODESystem(Simulacrum.get_value(make_equations(chx, f)), iv, states, ps)
 end
-function ModelingToolkit.ODESystem(chx::ChemicalHyperGraph{T}, f::Function; iv = Symbolics.variable(:t), ps = []) where {T<:Term}
+function ModelingToolkit.ODESystem(chx::ChemicalHyperGraph{T}, f::Function; iv = make_var(:t), ps = []) where {T<:Term}
     ODESystem(convert(ChemicalHyperGraph{Num}, chx), f, iv = iv, ps = ps)
 end
 
 # automatically convert equations in matrix form to vector (convenience)
-ModelingToolkit.ODESystem(eqs::Matrix{Equation}; iv = Symbolics.variable(:t), states = get_state_variables(vec(eqs)), ps = get_parameters(vec(eqs))) = ODESystem(vec(eqs), iv, states, ps)
+ModelingToolkit.ODESystem(eqs::Matrix{Equation}; iv = make_var(:t), states = get_state_variables(vec(eqs)), ps = get_parameters(vec(eqs))) = ODESystem(vec(eqs), iv, states, ps)
 
 # helper function that takes a hypergraph that has been made by cloning a base model n times and returns a map to be used with ModelingToolkit
 function clone_map(in_map::Vector{Pair{T, U}}, clones::Vector) where {T, U}
