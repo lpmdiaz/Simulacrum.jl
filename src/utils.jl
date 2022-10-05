@@ -28,7 +28,7 @@ function _check_symvar(var::Num)
         error("$var of type $vartype; expected SymbolicUtils.Sym")
     end
 end
-_make_subname(symname::Symbol, idx::Int) = Symbol(symname, join(Symbolics.map_subscripts.(idx), "ˏ"))
+_make_subname(symname::Symbol, idx::Int) = Symbol(symname, join(Symbolics.map_subscripts.(idx)))
 genvar(symname::Symbol) = first(@variables $symname)
 function genvar(symname::Symbol, idx::Int)
     (name = _make_subname(symname, idx); first(@variables $name))
@@ -45,16 +45,16 @@ make_var(symname::Symbol, args...) = genvar(symname, args...)
 make_vars(symnames::Vector{Symbol}, args...) = [genvar(symname, args...) for symname in symnames]
 
 # helper function that returns the symbolic variable given as input with the given subscript
-function subscript_var(var::Symbolic, sub::Int; iv = Symbolics.variable(:t))
+function subscript_var(var::Symbolic, sub::Int; iv = genvar(:t))
     symname = get_sym_name(var)
     if var isa Term
-        Symbolics.variable(symname, sub, T = Symbolics.FnType)(iv)
+        genvar(symname, sub, iv)
     elseif var isa Sym
-        Symbolics.variable(symname, sub)
+        genvar(symname, sub)
     end
 end
-subscript_var(v::Num, sub; iv = Symbolics.variable(:t)) = Num(subscript_var(get_value(v), sub, iv = iv))
-subscript_vars(vars::Vector{T}, sub; iv = Symbolics.variable(:t)) where {T<:SymTypes} = [subscript_var(var, sub, iv = iv) for var in vars]
+subscript_var(v::Num, sub; iv = genvar(:t)) = Num(subscript_var(get_value(v), sub, iv = iv))
+subscript_vars(vars::Vector{T}, sub; iv = genvar(:t)) where {T<:SymTypes} = [subscript_var(var, sub, iv = iv) for var in vars]
 
 # wrap SymbolicUtils variables in chemical hyperedges and hypergraphs into Symbolics.Num
 # useful when converting ModelingToolkit types to chemical hypergraphs and hyperedges and still use the Simulacrum functions that are defined on Num
